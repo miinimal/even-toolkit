@@ -1,6 +1,14 @@
-/** Convert Uint8Array of 16-bit signed PCM to Int16Array */
+/**
+ * Convert Uint8Array of 16-bit signed PCM to Int16Array.
+ * A trailing odd byte (half a sample) is ignored.
+ */
 export function uint8ToPcm16(data: Uint8Array): Int16Array {
-  return new Int16Array(data.buffer, data.byteOffset, data.byteLength / 2);
+  const samples = Math.floor(data.byteLength / 2);
+  if (data.byteOffset % 2 === 0) {
+    return new Int16Array(data.buffer, data.byteOffset, samples);
+  }
+  // An Int16Array view must start on a 2-byte boundary, so copy views that do not.
+  return new Int16Array(data.slice(0, samples * 2).buffer);
 }
 
 /** Convert Int16Array PCM to Float32Array [-1, 1] */

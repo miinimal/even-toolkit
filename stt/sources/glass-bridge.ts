@@ -99,9 +99,12 @@ export class GlassBridgeSource implements AudioSource {
   }
 }
 
-/** Convert raw bytes (16-bit PCM little-endian) to Float32Array */
+/**
+ * Convert raw bytes (16-bit PCM little-endian) to Float32Array.
+ * A trailing odd byte (half a sample) is ignored instead of reading past the end of the chunk.
+ */
 function pcm16ToFloat32(bytes: Uint8Array): Float32Array {
-  const samples = bytes.length / 2;
+  const samples = Math.floor(bytes.length / 2);
   const float32 = new Float32Array(samples);
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   for (let i = 0; i < samples; i++) {
